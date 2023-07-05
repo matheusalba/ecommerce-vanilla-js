@@ -1,62 +1,128 @@
 import './style.css'
 
+let productsCar = []
+
 const arr = [{
-    'name':'Trilogia Duna',
-    'offer':'à vista (5% de desconto)',
-    'price':'R$:146,00',
-    'img':'/duna-book.webp',
-    'code':0
+    name:'Trilogia Duna',
+    offer:'à vista (5% de desconto)',
+    price:146.00,
+    img:'/duna-book.webp',
+    code:0
 },
-{   'name':'IPhone',
-    'offer':'à vista (30% de desconto)',
-    'price':'R$:1,00',
-    'img':'/cel-san.webp',
-    'code':1
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:1
 },
-{   'name':'Ventilador',
-    'offer':'à vista (30% de desconto)',
-    'price':'R$:1,00',
-    'img':'/vetilador.jpg',
-    'code':2
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:2
 },
-{
-    'name':'Caneta Azul',
-    'offer':'à vista (30% de desconto)',
-    'price':'R$:5,00',
-    'img':'/azul-caneta.webp',
-    'code':3
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:3
 },
-{
-    'name':'Computador',
-    'offer':'à vista (30% de desconto)',
-    'price':'R$:500,00',
-    'img':'/comp.jpg',
-    'code':4
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:4
 },
-{
-    'name':'Zelter',
-    'offer':'à vista (30% de desconto)',
-    'price':'R$:220,00',
-    'img':'/zelter.jpg',
-    'code':5
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:5
 },
-{
-    'name':'Mouse',
-    'offer':'à vista (10% de desconto)',
-    'price':'R$:120,00',
-    'img':'/mouse.jpg',
-    'code':6
-    
+{   
+    name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:6
+},
+{   name:'IPhone',
+    offer:'à vista (30% de desconto)',
+    price:1.00,
+    img:'/cel-san.webp',
+    code:7
+}]
+
+function attObjMemoryCar(code){
+    productsCar.map( e => {
+        if (e.code === code){
+            e.quant--
+
+            if(e.quant===0){
+            document.querySelector('[data-js="car"]').querySelector(`[data-prod="${code}"]`).remove()
+            }else{
+                console.log(document.querySelector('[data-js="car"]').querySelector(`[data-prod="${code}"]`).querySelector(`[data-js="buy_desc"]`).querySelector(`[data-js="desc_quant"]`).textContent--)
+            }
+        }
+    })
+    let newProductsCar = productsCar.filter( e => e.quant > 0)
+    productsCar = newProductsCar
+    console.log(productsCar)
 }
-]
+        
+function getAnyByAny(code,field,arrGeneric){
+    for(let i = 0; i < arrGeneric.length; i++){
+        if(parseInt(arrGeneric[i].code) === parseInt(code)){
+            return arrGeneric[i][field]
+        }
+    }
+    return 0
+}
+
+function calcTotalPrice(){
+    let sum = 0
+    for(let i = 0; i < productsCar.length; i++){
+        sum += productsCar[i].price*productsCar[i].quant
+    }
+    return sum
+}
+
+function attTotalPrice(){
+    const totalPrice = document.getElementById("total_price")
+    totalPrice.innerHTML = `<div class="bar_price"> Preço do Carrinho: ${calcTotalPrice()}</div>` 
+}
+
+function addObjMemoryCar(code){
+    if(productsCar.length==0){
+        productsCar.push({
+            code:code,
+            quant:1,
+            price: getAnyByAny(code,'price',arr)
+        })
+    }else{
+        let check
+        for(let i = 0;i<productsCar.length;i++){
+            if(productsCar[i].code === code){
+                productsCar[i].quant++
+                check = true
+            }
+        }
+
+        if(check!=true){
+        productsCar.push({
+            code:code,
+            quant:1,
+            price: getAnyByAny(code,'price',arr)
+        })}
+    }
+}
 
 function checkProducts(obj){
     const products = document.getElementsByClassName('buy')
     if (products.length===0){return false}
     for(let i = 0 ; i < Array.from(products).length ; i++ ){
         if(Array.from(products)[i].dataset.prod === obj.prod){
-            Array.from(products)[i].querySelector('[data-js="buy_desc"]').querySelector('[data-js="desc_quant"]').textContent = 
-            parseInt (Array.from(products)[i].querySelector('[data-js="buy_desc"]').querySelector('[data-js="desc_quant"]').textContent) + 1
+            Array.from(products)[i].querySelector('[data-js="buy_desc"]').querySelector('[data-js="desc_quant"]').textContent = getAnyByAny(obj.prod,'quant',productsCar) + 1
             return true
         }
     }
@@ -87,6 +153,7 @@ function addBuy(obj){
         div_quant.appendChild(quant)
         name.textContent = obj.name
         const img = document.createElement('img')
+        img.className='buy_img'
         img.src = obj.img
         buy.appendChild(img)
         buy.className = 'buy'
@@ -95,23 +162,31 @@ function addBuy(obj){
         buy_desc.appendChild(name)
         buy_desc.appendChild(div_quant)
         buy.appendChild(buy_desc)
-        car.insertAdjacentElement('afterbegin',buy)
+        car.insertAdjacentElement('beforeend',buy)
+        img.addEventListener('click', e => {
+            attObjMemoryCar(e.target.parentNode.dataset.prod)
+        })
+        
     }
 
 }
 
 function buyEvent(){
-    const elements = document.getElementsByClassName('name')
+    const elements = document.getElementsByClassName('prod')
     Array.from(elements).forEach( e => {
         const obj = {
-            img:e.parentNode.parentNode.firstChild.firstChild.src,
-            name:e.textContent,
-            prod:e.parentNode.parentNode.dataset.prod
+            img: e.children[0].firstChild.src,
+            prod: e.dataset.prod,
+            name: e.children[1].firstChild.textContent  
         }
-        e.addEventListener('click', (e)=>{
+        const code = e.dataset.prod
+        e.addEventListener('click', element => {
             addBuy(obj)
-        }) 
+            addObjMemoryCar(code)
+            attTotalPrice()
+        })
     })
+
 }
 
 function addProduct(arr){
@@ -136,7 +211,7 @@ function addProduct(arr){
         offer.textContent = element.offer
         const price = document.createElement('p')
         price.className = 'price'
-        price.textContent = element.price
+        price.textContent = `R$: ${element.price}`
         desc.appendChild(name)
         desc.appendChild(offer)
         desc.appendChild(price)
@@ -153,3 +228,4 @@ function addProduct(arr){
 
 addProduct(arr)
 buyEvent()
+
