@@ -67,6 +67,7 @@ function attObjMemoryCar(code){
     })
     let newProductsCar = productsCar.filter( e => e.quant > 0)
     productsCar = newProductsCar
+    attTotalPrice()
     console.log(productsCar)
 }
         
